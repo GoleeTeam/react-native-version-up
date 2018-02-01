@@ -1,19 +1,19 @@
 # React native version upper
 Increase `major`, `minor` or `patch` part of the version and build number in your app in package.json and in ios and android projects with one command.
 ```
-node ./node_modules/react-native-version-up/index.js --patch -m 'commit message'
+node ./node_modules/react-native-version-or-build-up/index.js --patch -m 'commit message'
 ```
 
 With this script you can:
 - Increase `major`, `minor` or `patch` part in the version.
-- Increase `build` in `ios` or `android` or both by default. (i.e node ./node_modules/react-native-version-up/index.js --build --{ios/android}, or just --build for both);
+- Increase `build` in `ios` or `android` or both by default. (i.e node ./node_modules/react-native-version-or-build-up/index.js --build --{ios/android}, or just --build for both);
 - Make a git commit with version changes.
 - Make a git tag with new version.
 
 ## Example
 ```bash
 > yarn run version:up -- --patch
-$ node ./node_modules/react-native-version-up/index.js "--patch"
+$ node ./node_modules/react-native-version-or-build-up/index.js "--patch"
 
 I'm going to increase the version in:
   - package.json (./package.json);
@@ -47,12 +47,12 @@ Done!
 
 ## Installation
 ```
-yarn add react-native-version-up
+yarn add react-native-version-or-build-up
 ```
 
 Or via npm:
 ```
-npm install react-native-version-up --save
+npm install react-native-version-or-build-up --save
 ```
 
 ## Usage
@@ -61,7 +61,7 @@ npm install react-native-version-up --save
 {
   "name": "your-project-name",
   "scripts": {
-    "version:up": "node ./node_modules/react-native-version-up/index.js"
+    "version:up": "node ./node_modules/react-native-version-or-build-up/index.js"
   }
 }
 ```
@@ -72,7 +72,7 @@ npm install react-native-version-up --save
   "name": "your-project-name",
   "version": "1.0.0",
   "scripts": {
-    "version:up": "node ./node_modules/react-native-version-up/index.js"
+    "version:up": "node ./node_modules/react-native-version-or-build-up/index.js"
   }
 }
 ```
