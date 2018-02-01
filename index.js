@@ -15,18 +15,35 @@ const info = helpers.getPackageInfo(pathToPackage);
 const pathToPlist = argv.pathToPlist || `${pathToRoot}/ios/${info.name}/Info.plist`;
 const pathToGradle = argv.pathToGradle || `${pathToRoot}/android/app/build.gradle`;
 
-
 // getting next version
 const versionCurrent = info.version;
 const versions = helpers.versions(versionCurrent);
 let major = helpers.version(versions[0], argv.major);
 let minor = helpers.version(versions[1], argv.minor, argv.major);
 let patch = helpers.version(versions[2], argv.patch, argv.major || argv.minor);
-const version = `${major}.${minor}.${patch}`;
+let buildOption = argv.build || false;
 
 // getting next build number
 const buildCurrent = helpers.getBuildNumberFromPlist(pathToPlist);
 const build = buildCurrent + 1;
+
+if (buildOption) {
+  if (argv.ios) {
+    helpers.changeBuildInPlist(pathToPlist, build);
+    console.log(`Build number in plist incremented from ${buildCurrent} to ${build}`);
+    return;
+  } else if (argv.android) {
+    helpers.changeBuildInGradle(pathToGradle, build);
+    console.log(`Build number in gradle incremented from ${buildCurrent} to ${build}`);
+  } else {
+    helpers.changeBuildInPlist(pathToPlist, build);
+    helpers.changeBuildInGradle(pathToGradle, build);
+    console.log(`Build number incremented in plist and gradle from ${buildCurrent} to ${build}`);
+  }
+  return;
+}
+
+const version = `${major}.${minor}.${patch}`;
 
 // getting commit message
 const message = argv.m || argv.message || `release ${version}: increase versions and build numbers`;

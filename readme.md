@@ -6,6 +6,7 @@ node ./node_modules/react-native-version-up/index.js --patch -m 'commit message'
 
 With this script you can:
 - Increase `major`, `minor` or `patch` part in the version.
+- Increase `build` in `ios` or `android` or both by default. (i.e node ./node_modules/react-native-version-up/index.js --build --{ios/android}, or just --build for both);
 - Make a git commit with version changes.
 - Make a git tag with new version.
 
