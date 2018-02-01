@@ -1,6 +1,6 @@
 {
-  "name": "react-native-version-up",
-  "version": "1.0.7",
+  "name": "react-native-version-or-build-up",
+  "version": "1.0.8",
   "description": "Increase version and build number in your react native app for package.json and both platforms (ios && android) with one command",
   "main": "index.js",
   "scripts": {
@@ -8,13 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gustarus/react-native-version-up.git"
+    "url": "git+https://github.com/joshjconlin/react-native-version-up.git"
   },
   "keywords": [
     "react native version",
-    "react native version up"
+    "react native version up",
+    "react native build up"
   ],
-  "author": "Pavel Kondratenko",
+  "author": "Pavel Kondratenko, Josh Conlin",
   "license": "ISC",
   "dependencies": {
     "chalk": "2.0.1",
