@@ -10,6 +10,7 @@ const log = require('./lib/log');
 
 const pathToRoot = process.cwd();
 const pathToPackage = argv.pathToPackage || `${pathToRoot}/package.json`;
+const pathToAppJson = `${pathToRoot}/app.json`;
 const info = helpers.getPackageInfo(pathToPackage);
 
 const pathToPlist = argv.pathToPlist || `${pathToRoot}/ios/${info.name}/Info.plist`;
@@ -83,6 +84,10 @@ const update = chain.then(() => {
   log.info('Updating version in package.json...', 1);
 
   helpers.changeVersionInPackage(pathToPackage, version);
+  if (fs.existsSync(pathToAppJson)) {
+    helpers.changeVersionInAppJson(pathToAppJson, version);
+    log.success(`Version in app.json changed.`, 2)
+  }
   log.success(`Version in package.json changed.`, 2);
 }).then(() => {
   log.info('Updating version in xcode project...', 1);
