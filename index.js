@@ -86,7 +86,9 @@ const update = chain.then(() => {
   helpers.changeVersionInPackage(pathToPackage, version);
   if (fs.existsSync(pathToAppJson)) {
     helpers.changeVersionInAppJson(pathToAppJson, version);
-    log.success(`Version in app.json changed.`, 2)
+    helpers.changeIosBuildNumberInAppJson(pathToAppJson, build);
+    helpers.changeAndroidVersionCodeInAppJson(pathToAppJson, build);
+    log.success(`Version and builds in app.json changed.`, 2)
   }
   log.success(`Version in package.json changed.`, 2);
 }).then(() => {
