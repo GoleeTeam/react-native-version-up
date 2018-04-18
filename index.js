@@ -31,14 +31,18 @@ const build = buildCurrent + 1;
 if (buildOption) {
   if (argv.ios) {
     helpers.changeBuildInPlist(pathToPlist, build);
+    helpers.changeIosBuildNumberInAppJson(pathToAppJson, build);
     console.log(`Build number in plist incremented from ${buildCurrent} to ${build}`);
     return;
   } else if (argv.android) {
     helpers.changeBuildInGradle(pathToGradle, build);
+    helpers.changeAndroidVersionCodeInAppJson(pathToAppJson, build);
     console.log(`Build number in gradle incremented from ${buildCurrent} to ${build}`);
   } else {
     helpers.changeBuildInPlist(pathToPlist, build);
     helpers.changeBuildInGradle(pathToGradle, build);
+    helpers.changeIosBuildNumberInAppJson(pathToAppJson, build);
+    helpers.changeAndroidVersionCodeInAppJson(pathToAppJson, build);
     console.log(`Build number incremented in plist and gradle from ${buildCurrent} to ${build}`);
   }
   return;
