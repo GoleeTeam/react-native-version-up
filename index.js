@@ -23,6 +23,16 @@ let major = helpers.version(versions[0], argv.major);
 let minor = helpers.version(versions[1], argv.minor, argv.major);
 let patch = helpers.version(versions[2], argv.patch, argv.major || argv.minor);
 let buildOption = argv.build || false;
+let jsBundle = argv.jsBundle || false;
+
+if (jsBundle) {
+  const appJson = require(pathToAppJson);
+  let version = parseInt(appJson.jsBundleIdentifier, 10);
+  version += 1;
+  helpers.changeJsBundleVersionInAppJson(pathToAppJson, version);
+  console.log(`jsBundleIdentifier changed in app.json to ${version}`);
+  return;
+}
 
 // getting next build number
 const buildCurrent = helpers.getBuildNumberFromPlist(pathToPlist);
