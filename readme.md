@@ -1,3 +1,7 @@
+# Install
+```npm install react-native-version-or-build-up```
+
+
 # React native version upper
 Increase `major`, `minor` or `patch` part of the version and build number in your app in package.json and in ios and android projects with one command.
 ```
