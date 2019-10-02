@@ -123,8 +123,9 @@ const update = chain.then(() => {
   log.success(`Version and build number in android project (gradle file) changed.`, 2);
 });
 
+//when do commit
 const isCommitNeeded = () => {
-  return !ci || message
+  return !ci || argv.m || argv.message
 }
 
 const commit = update.then(() => {
