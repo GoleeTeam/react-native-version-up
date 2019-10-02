@@ -24,6 +24,7 @@ let minor = helpers.version(versions[1], argv.minor, argv.major);
 let patch = helpers.version(versions[2], argv.patch, argv.major || argv.minor);
 let buildOption = argv.build || false;
 let jsBundle = argv.jsBundle || false;
+let ci = argv.ci || false;
 
 if (jsBundle) {
   const appJson = require(pathToAppJson);
@@ -86,9 +87,14 @@ const chain = new Promise((resolve, reject) => {
     log.warning(`I can\'t understand format of the version "${versionCurrent}".`);
   }
 
-  const question = log.info(`Use "${version}" as the next version? [y/n] `, 0, true);
-  const answer = readlineSync.question(question).toLowerCase();
-  answer === 'y' ? resolve() : reject('Process canceled.');
+  if(!ci){
+    const question = log.info(`Use "${version}" as the next version? [y/n] `, 0, true);
+    const answer = readlineSync.question(question).toLowerCase();
+    answer === 'y' ? resolve() : reject('Process canceled.');
+  }else{
+    resolve()
+  }
+  
 });
 
 
@@ -118,24 +124,32 @@ const update = chain.then(() => {
 });
 
 const commit = update.then(() => {
-  log.notice(`\nI'm ready to cooperate with the git!`);
-  log.info('I want to make a commit with message:', 1);
-  log.info(`"${message}"`, 2);
-  log.info(`I want to add a tag:`, 1);
-  log.info(`"v${version}"`, 2);
+  if(!ci){
+    log.notice(`\nI'm ready to cooperate with the git!`);
+    log.info('I want to make a commit with message:', 1);
+    log.info(`"${message}"`, 2);
+    log.info(`I want to add a tag:`, 1);
+    log.info(`"v${version}"`, 2);
+  }
 
-  const question = log.info(`Do you allow me to do this? [y/n] `, 1, true);
-  const answer = readlineSync.question(question).toLowerCase();
-  if (answer === 'y') {
-    return helpers.commitVersionIncrease(version, message, [
-      pathToPackage,
-      pathToPlist,
-      pathToGradle
-    ]).then(() => {
-      log.success(`Commit with files added. Run "git push".`, 1);
-    });
-  } else {
-    log.warning(`Skipped.`, 1);
+  var question = null;
+  var answer = null;
+  if(!ci){
+    question = log.info(`Do you allow me to do this? [y/n] `, 1, true);
+    answer = readlineSync.question(question).toLowerCase();
+  }
+  if(!ci){
+    if (answer === 'y') {
+      return helpers.commitVersionIncrease(version, message, [
+        pathToPackage,
+        pathToPlist,
+        pathToGradle
+      ]).then(() => {
+        log.success(`Commit with files added. Run "git push".`, 1);
+      });
+    } else {
+      log.warning(`Skipped.`, 1);
+    }
   }
 });
 
