@@ -138,8 +138,8 @@ const commit = update.then(() => {
     question = log.info(`Do you allow me to do this? [y/n] `, 1, true);
     answer = readlineSync.question(question).toLowerCase();
   }
-  if(!ci){
-    if (answer === 'y') {
+  if(!ci || message){
+    if (answer === 'y' || message) {
       return helpers.commitVersionIncrease(version, message, [
         pathToPackage,
         pathToPlist,
