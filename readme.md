@@ -107,6 +107,8 @@ yarn run version:up -- --flag value
 | **`--major`** | `flag` | | Increase `major` version:<br/>**0**.0.0 -> **1**.0.0 |
 | **`--minor`** | `flag` | | Increase `minor` version:<br/>0.**0**.0 -> 0.**1**.0 |
 | **`--patch`** | `flag` | | Increase `patch` version:<br/>0.0.**0** -> 0.0.**1** |
+| **`--ci`** | `flag` | | Skip answers for CI (If you want to commit, use **`--message` or `-m`**). |
+
 | **`--message` or `-m`** | `string` | `"release ${version}: increase versions and build numbers"` | Custom commit message. |
 | **`--pathToPackage './path'`** | `string` | `./package.json` | Path to `package.json` file in your project. |
 | **`--pathToPlist './path'`** | `string` | `./ios/${package.name}/Info.plist` | Path to `Info.plist` file (ios project). |
