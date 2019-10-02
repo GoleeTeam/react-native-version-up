@@ -123,6 +123,10 @@ const update = chain.then(() => {
   log.success(`Version and build number in android project (gradle file) changed.`, 2);
 });
 
+const isCommitNeeded = () => {
+  return !ci || message
+}
+
 const commit = update.then(() => {
   if(!ci){
     log.notice(`\nI'm ready to cooperate with the git!`);
@@ -138,7 +142,7 @@ const commit = update.then(() => {
     question = log.info(`Do you allow me to do this? [y/n] `, 1, true);
     answer = readlineSync.question(question).toLowerCase();
   }
-  if(!ci || message){
+  if(isCommitNeeded()){
     if (answer === 'y' || message) {
       return helpers.commitVersionIncrease(version, message, [
         pathToPackage,
@@ -153,9 +157,11 @@ const commit = update.then(() => {
   }
 });
 
-commit.then(() => {
-  log.success(`\nDone!`);
-}).catch(e => {
-  log.line();
-  log.error(e)
-});
+if(isCommitNeeded()){
+  commit.then(() => {
+    log.success(`\nDone!`);
+  }).catch(e => {
+    log.line();
+    log.error(e)
+  });
+}
