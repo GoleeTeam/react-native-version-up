@@ -8,6 +8,17 @@ const helpers = require('./lib/helpers');
 const log = require('./lib/log');
 
 
+const getBuildNumberFromGradle = (pathToGradle) => {
+  let content = fs.readFileSync(pathToGradle, 'utf8');
+  const match = content.match(/(\s*versionCode\s+["']?)(\d+)(["']?\s*)/g);
+    if (match && match[0]) {
+      const build = match[0].match(/\d+/g)[0]
+      return parseInt(build);
+    }
+  return 1
+}
+
+
 const pathToRoot = process.cwd();
 const pathToPackage = argv.pathToPackage || `${pathToRoot}/package.json`;
 const pathToAppJson = `${pathToRoot}/app.json`;
@@ -36,27 +47,36 @@ if (jsBundle) {
 }
 
 // getting next build number
-const buildCurrent = helpers.getBuildNumberFromPlist(pathToPlist);
-const build = buildCurrent + 1;
+const buildCurrentIos = helpers.getBuildNumberFromPlist(pathToPlist);
+const buildCurrentAndroid = getBuildNumberFromGradle(pathToGradle);
+
+// TODO: const buildApp = buildCurrentIos + 1;
+const buildIos = (argv.major || argv.major || argv.patch) ? 1 : (buildOption ? buildCurrentIos+1 : buildCurrentIos)
+const buildAndroid = buildOption ? buildCurrentAndroid+1 : buildCurrentAndroid
 
 if (buildOption) {
   if (argv.ios) {
-    helpers.changeBuildInPlist(pathToPlist, build);
-    helpers.changeIosBuildNumberInAppJson(pathToAppJson, build);
-    console.log(`Build number in plist incremented from ${buildCurrent} to ${build}`);
-    return;
+    helpers.changeBuildInPlist(pathToPlist, buildIos);
+    helpers.changeIosBuildNumberInAppJson(pathToAppJson, buildIos);
+    if((argv.major || argv.major || argv.patch) && buildOption)
+      console.log("No build changed for iOS because --major --minor or --patch used")
+    else
+      console.log(`Build number in plist incremented from ${buildCurrentIos} to ${buildIos}`);
   } else if (argv.android) {
-    helpers.changeBuildInGradle(pathToGradle, build);
-    helpers.changeAndroidVersionCodeInAppJson(pathToAppJson, build);
-    console.log(`Build number in gradle incremented from ${buildCurrent} to ${build}`);
+    helpers.changeBuildInGradle(pathToGradle, buildAndroid);
+    helpers.changeAndroidVersionCodeInAppJson(pathToAppJson, buildAndroid);
+    console.log(`Build number in gradle incremented from ${buildCurrentIos} to ${buildAndroid}`);
   } else {
-    helpers.changeBuildInPlist(pathToPlist, build);
-    helpers.changeBuildInGradle(pathToGradle, build);
-    helpers.changeIosBuildNumberInAppJson(pathToAppJson, build);
-    helpers.changeAndroidVersionCodeInAppJson(pathToAppJson, build);
-    console.log(`Build number incremented in plist and gradle from ${buildCurrent} to ${build}`);
+    helpers.changeBuildInPlist(pathToPlist, buildIos);
+    helpers.changeBuildInGradle(pathToGradle, buildAndroid);
+    helpers.changeIosBuildNumberInAppJson(pathToAppJson, buildIos);
+    helpers.changeAndroidVersionCodeInAppJson(pathToAppJson, buildAndroid);
+    if((argv.major || argv.major || argv.patch) && buildOption)
+      console.log("No build changed for iOS because --major --minor or --patch used")
+    else
+      console.log(`Build number in plist incremented from ${buildCurrentIos} to ${buildIos}`);
+    console.log(`Build number in gradle incremented from ${buildCurrentIos} to ${buildAndroid}`);
   }
-  return;
 }
 
 const version = `${major}.${minor}.${patch}`;
@@ -64,16 +84,18 @@ const version = `${major}.${minor}.${patch}`;
 // getting commit message
 const message = argv.m || argv.message || `release ${version}: increase versions and build numbers`;
 
+if (buildOption || buildAndroid != buildCurrentAndroid || buildIos != buildCurrentIos) {
+  log.info('\nI\'m going to increase the version in:');
+  log.info(`- package.json (${pathToPackage});`, 1);
+  log.info(`- ios project (${pathToPlist});`, 1);
+  log.info(`- android project (${pathToGradle}).`, 1);
 
-log.info('\nI\'m going to increase the version in:');
-log.info(`- package.json (${pathToPackage});`, 1);
-log.info(`- ios project (${pathToPlist});`, 1);
-log.info(`- android project (${pathToGradle}).`, 1);
-
-log.notice(`\nThe version will be changed:`);
-log.notice(`- from: ${versionCurrent} (${buildCurrent});`, 1);
-log.notice(`- to:   ${version} (${build}).`, 1);
-
+  log.notice(`\nThe version will be changed (IOS):`);
+  log.notice(`- from: ${versionCurrent} (${buildCurrentIos});`, 1);
+  log.notice(`- to:   ${version} (${buildIos}).`, 1);
+  log.notice(`\n- from: ${versionCurrent} (${buildCurrentAndroid});`, 1);
+  log.notice(`- to:   ${version} (${buildAndroid}).`, 1);
+}
 if (version === versionCurrent) {
   log.warning('\nNothing to change in the version. Canceled.');
   process.exit();
@@ -106,20 +128,20 @@ const update = chain.then(() => {
   helpers.changeVersionInPackage(pathToPackage, version);
   if (fs.existsSync(pathToAppJson)) {
     helpers.changeVersionInAppJson(pathToAppJson, version);
-    helpers.changeIosBuildNumberInAppJson(pathToAppJson, build);
-    helpers.changeAndroidVersionCodeInAppJson(pathToAppJson, build);
+    helpers.changeIosBuildNumberInAppJson(pathToAppJson, buildIos);
+    helpers.changeAndroidVersionCodeInAppJson(pathToAppJson, buildAndroid);
     log.success(`Version and builds in app.json changed.`, 2)
   }
   log.success(`Version in package.json changed.`, 2);
 }).then(() => {
   log.info('Updating version in xcode project...', 1);
 
-  helpers.changeVersionAndBuildInPlist(pathToPlist, version, build);
+  helpers.changeVersionAndBuildInPlist(pathToPlist, version, buildIos);
   log.success(`Version and build number in ios project (plist file) changed.`, 2);
 }).then(() => {
   log.info('Updating version in android project...', 1);
 
-  helpers.changeVersionAndBuildInGradle(pathToGradle, version, build);
+  helpers.changeVersionAndBuildInGradle(pathToGradle, version, buildAndroid);
   log.success(`Version and build number in android project (gradle file) changed.`, 2);
 });
 
@@ -128,23 +150,22 @@ const isCommitNeeded = () => {
   return !ci || argv.m || argv.message
 }
 
-const commit = update.then(() => {
-  if(!ci){
+console.log("isCommitNeeded",isCommitNeeded())
+if(isCommitNeeded()){
+  const commit = update.then(() => {
     log.notice(`\nI'm ready to cooperate with the git!`);
     log.info('I want to make a commit with message:', 1);
     log.info(`"${message}"`, 2);
     log.info(`I want to add a tag:`, 1);
     log.info(`"v${version}"`, 2);
-  }
 
-  var question = null;
-  var answer = null;
-  if(!ci){
-    question = log.info(`Do you allow me to do this? [y/n] `, 1, true);
-    answer = readlineSync.question(question).toLowerCase();
-  }
-  if(isCommitNeeded()){
-    if (answer === 'y' || message) {
+    var question = null;
+    var answer = null;
+    if(!ci){
+      question = log.info(`Do you allow me to do this? [y/n] `, 1, true);
+      answer = readlineSync.question(question).toLowerCase();
+    }
+    if ((ci && message) || answer === 'y') {
       return helpers.commitVersionIncrease(version, message, [
         pathToPackage,
         pathToPlist,
@@ -155,10 +176,7 @@ const commit = update.then(() => {
     } else {
       log.warning(`Skipped.`, 1);
     }
-  }
-});
-
-if(isCommitNeeded()){
+  });
   commit.then(() => {
     log.success(`\nDone!`);
   }).catch(e => {

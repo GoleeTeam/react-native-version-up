@@ -113,3 +113,15 @@ yarn run version:up -- --flag value
 | **`--pathToPackage './path'`** | `string` | `./package.json` | Path to `package.json` file in your project. |
 | **`--pathToPlist './path'`** | `string` | `./ios/${package.name}/Info.plist` | Path to `Info.plist` file (ios project). |
 | **`--pathToGradle './path'`** | `string` | `./android/app/build.gradle` | Path to `build.gradle` file (android project). |
+
+
+## Examples
+
+1. Increment build
+```$ node ./node_modules/react-native-version-or-build-up/index.js --ci --build```
+
+2. Increment major version (no build updated)
+```$ node ./node_modules/react-native-version-or-build-up/index.js --ci --major```
+
+2. Increment major version and build (for iOS if major,minor or patch is changed then the build restarts from 1)
+```$ node ./node_modules/react-native-version-or-build-up/index.js --ci --major```

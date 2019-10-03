@@ -1,6 +1,6 @@
 {
   "name": "react-native-version-or-build-up",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Increase version and build number in your react native app for package.json and both platforms (ios && android) with one command",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "react native version up",
     "react native build up"
   ],
-  "author": "Pavel Kondratenko, Josh Conlin",
+  "author": "Pavel Kondratenko, Josh Conlin - Forked by Golee Team",
   "license": "ISC",
   "dependencies": {
     "chalk": "2.0.1",
