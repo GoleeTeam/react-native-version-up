@@ -1,6 +1,6 @@
 {
   "name": "react-native-version-or-build-up",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Increase version and build number in your react native app for package.json and both platforms (ios && android) with one command",
   "main": "index.js",
   "scripts": {

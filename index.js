@@ -50,7 +50,6 @@ if (jsBundle) {
 const buildCurrentIos = helpers.getBuildNumberFromPlist(pathToPlist);
 const buildCurrentAndroid = getBuildNumberFromGradle(pathToGradle);
 
-// TODO: const buildApp = buildCurrentIos + 1;
 const buildIos = (argv.major || argv.major || argv.patch) ? 1 : (buildOption ? buildCurrentIos+1 : buildCurrentIos)
 const buildAndroid = buildOption ? buildCurrentAndroid+1 : buildCurrentAndroid
 
@@ -82,7 +81,8 @@ if (buildOption) {
 const version = `${major}.${minor}.${patch}`;
 
 // getting commit message
-const message = argv.m || argv.message || `release ${version}: increase versions and build numbers`;
+const messageArg = argv.m || argv.message
+const message = messageArg ? `${messageArg} - ${version} - ios_${buildIos} - android_${buildAndroid}` : `release ${version}: increase versions and build numbers`;
 
 if (buildOption || buildAndroid != buildCurrentAndroid || buildIos != buildCurrentIos) {
   log.info('\nI\'m going to increase the version in:');
@@ -98,7 +98,6 @@ if (buildOption || buildAndroid != buildCurrentAndroid || buildIos != buildCurre
 }
 if (version === versionCurrent) {
   log.warning('\nNothing to change in the version. Canceled.');
-  process.exit();
 }
 
 
@@ -150,7 +149,6 @@ const isCommitNeeded = () => {
   return !ci || argv.m || argv.message
 }
 
-console.log("isCommitNeeded",isCommitNeeded())
 if(isCommitNeeded()){
   const commit = update.then(() => {
     log.notice(`\nI'm ready to cooperate with the git!`);
@@ -166,7 +164,8 @@ if(isCommitNeeded()){
       answer = readlineSync.question(question).toLowerCase();
     }
     if ((ci && message) || answer === 'y') {
-      return helpers.commitVersionIncrease(version, message, [
+      let tag = `${version}_IOS${buildIos}_ANDROID${buildAndroid}`
+      return helpers.commitVersionIncrease(tag, message, [
         pathToPackage,
         pathToPlist,
         pathToGradle
